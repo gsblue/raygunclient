@@ -1,0 +1,17 @@
+{
+	"ImportPath": "github.com/gsblue/raygunclient",
+	"GoVersion": "go1.6",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/kaeuferportal/stack2struct",
+			"Rev": "6838fbadc9188e5d5778b0c708da95d90653bda0"
+		},
+		{
+			"ImportPath": "github.com/pborman/uuid",
+			"Rev": "dee7705ef7b324f27ceb85a121c61f2c2e8ce988"
+		}
+	]
+}
