@@ -67,4 +67,5 @@ func doSomeWork() error {
 Note, by default stack trace is captured and sent to raygun. 
 But if you want to use send custom stack trace, you can use the ```NotifyWithStackOrigin``` method.
 
+
 Pull requests are welcome.
