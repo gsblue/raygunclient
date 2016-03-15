@@ -3,14 +3,14 @@ package raygunclient
 import (
 	"net/http"
 
-	"github.com/gsblue/raygunclient/internal"
+	"github.com/gsblue/raygunclient/httpdata"
 )
 
 //ErrorEntry holds the information about the error and meta data
 //needed to be recorded in raygun
 type ErrorEntry struct {
 	Error      error
-	Request    *internal.HTTPRequest
+	Request    *httpdata.HTTPRequest
 	CustomData interface{}
 	User       string
 	Tags       []string
@@ -25,7 +25,7 @@ func NewErrorEntry(err error) *ErrorEntry {
 
 // SetRequest is a chainable option-setting method to add a request to this entry.
 func (e *ErrorEntry) SetRequest(r *http.Request) *ErrorEntry {
-	e.Request = internal.NewHTTPRequest(r)
+	e.Request = httpdata.NewHTTPRequest(r)
 	return e
 }
 

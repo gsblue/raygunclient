@@ -4,6 +4,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gsblue/raygunclient/httpdata"
 	"github.com/gsblue/raygunclient/stack"
 )
 
@@ -20,15 +21,15 @@ type PostRequest struct {
 }
 
 type errorDetails struct {
-	MachineName    string       `json:"machineName"`    // the machine's hostname
-	Version        string       `json:"version"`        // the version from context
-	Error          *errorData   `json:"error"`          // everything we know about the error itself
-	Tags           []string     `json:"tags"`           // the tags from context
-	UserCustomData interface{}  `json:"userCustomData"` // the custom data from the context
-	Request        *HTTPRequest `json:"request"`        // the request from the context
-	User           *user        `json:"user"`           // the user from the context
-	Context        *context     `json:"context"`        // the identifier from the context
-	Client         *clientInfo  `json:"client"`         // information on this client
+	MachineName    string                `json:"machineName"`    // the machine's hostname
+	Version        string                `json:"version"`        // the version from context
+	Error          *errorData            `json:"error"`          // everything we know about the error itself
+	Tags           []string              `json:"tags"`           // the tags from context
+	UserCustomData interface{}           `json:"userCustomData"` // the custom data from the context
+	Request        *httpdata.HTTPRequest `json:"request"`        // the request from the context
+	User           *user                 `json:"user"`           // the user from the context
+	Context        *context              `json:"context"`        // the identifier from the context
+	Client         *clientInfo           `json:"client"`         // information on this client
 }
 
 // user holds information on the affected user.
@@ -48,8 +49,13 @@ type clientInfo struct {
 	ClientURL string `json:"clientUrl"`
 }
 
+type errorData struct {
+	Message    string      `json:"message"`    // the actual message the error produced
+	StackTrace stack.Trace `json:"stackTrace"` // the error's stack trace
+}
+
 //NewPostRequest creates a post request frome the arguments provided
-func NewPostRequest(err error, req *HTTPRequest,
+func NewPostRequest(err error, req *httpdata.HTTPRequest,
 	customData interface{}, u string, tags []string,
 	version string, id string) *PostRequest {
 
@@ -59,7 +65,7 @@ func NewPostRequest(err error, req *HTTPRequest,
 	}
 }
 
-func newErrorDetails(err error, req *HTTPRequest,
+func newErrorDetails(err error, req *httpdata.HTTPRequest,
 	customData interface{}, u string, tags []string,
 	version string, id string) *errorDetails {
 
