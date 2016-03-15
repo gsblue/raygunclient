@@ -2,6 +2,7 @@ package raygunclient
 
 import (
 	"github.com/gsblue/raygunclient/internal"
+	"github.com/gsblue/raygunclient/stack"
 	"github.com/pborman/uuid"
 )
 
@@ -12,7 +13,7 @@ var defaultOptions = &ClientOptions{false, false}
 //Notifier notifies raygun about the error
 type Notifier interface {
 	Notify(entry *ErrorEntry) error
-	NotifyWithStackOrigin(entry *ErrorEntry, lineNumber int, packageName, fileName, methodName string) error
+	NotifyWithStackTrace(entry *ErrorEntry, t stack.Trace) error
 }
 
 type client struct {
@@ -51,10 +52,10 @@ func (c *client) Notify(entry *ErrorEntry) error {
 	return internal.Post(c.endpoint, req, c.apiKey, c.opts.Silent, c.opts.Debug)
 }
 
-func (c *client) NotifyWithStackOrigin(entry *ErrorEntry, lineNumber int, packageName, fileName, methodName string) error {
+func (c *client) NotifyWithStackTrace(entry *ErrorEntry, t stack.Trace) error {
 	req := internal.NewPostRequest(entry.Error, entry.Request, entry.CustomData,
 		entry.User, entry.Tags, c.version, c.ctxIdentifier)
-	req.SetStackTrace(lineNumber, packageName, fileName, methodName)
+	req.SetStackTrace(t)
 
 	return internal.Post(c.endpoint, req, c.apiKey, c.opts.Silent, c.opts.Debug)
 }

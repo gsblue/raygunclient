@@ -3,6 +3,8 @@ package internal
 import (
 	"os"
 	"time"
+
+	"github.com/gsblue/raygunclient/stack"
 )
 
 var defaultClientInfo = &clientInfo{
@@ -68,7 +70,7 @@ func newErrorDetails(err error, req *HTTPRequest,
 	return &errorDetails{
 		MachineName:    hostname,
 		Version:        version,
-		Error:          &errorData{err.Error(), currentStack()},
+		Error:          &errorData{err.Error(), stack.CurrentStack()},
 		Tags:           tags,
 		User:           &user{u},
 		Request:        req,
@@ -79,8 +81,6 @@ func newErrorDetails(err error, req *HTTPRequest,
 }
 
 //SetStackTrace sets the stack trace information in the request
-func (req *PostRequest) SetStackTrace(lineNumber int, packageName, fileName, methodName string) {
-	stack := make(stackTrace, 0, 0)
-	stack.AddEntry(lineNumber, packageName, fileName, methodName)
-	req.Details.Error.StackTrace = stack
+func (req *PostRequest) SetStackTrace(t stack.Trace) {
+	req.Details.Error.StackTrace = t
 }

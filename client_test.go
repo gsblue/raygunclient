@@ -10,6 +10,7 @@ import (
 	"reflect"
 
 	"github.com/gsblue/raygunclient/internal"
+	"github.com/gsblue/raygunclient/stack"
 )
 
 func TestClientCanNotifyRaygunAboutError(t *testing.T) {
@@ -60,13 +61,11 @@ func TestClientCanNotifyRaygunAboutError(t *testing.T) {
 	}
 }
 
-func TestClientCanNotifyRaygunAboutErrorWithCustomStack(t *testing.T) {
+func TestClientCanNotifyRaygunAboutErrorWithCustomStackTrace(t *testing.T) {
 	err := errors.New("something went wrong")
 	entry := NewErrorEntry(err)
-	lineNumber := 23
-	packageName := "github.com/gsblue/raygunclient"
-	fileName := "main.go"
-	methodName := "Notify"
+	trace := make(stack.Trace, 0, 0)
+	trace.AddEntry(23, "github.com/gsblue/raygunclient", "main.go", "Notify")
 
 	c := NewClient("apiKey", "version", defaultOptions).(*client)
 
@@ -77,15 +76,8 @@ func TestClientCanNotifyRaygunAboutErrorWithCustomStack(t *testing.T) {
 		if err := d.Decode(&req); err != nil {
 			t.Error(err)
 		}
-		s := req.Details.Error.StackTrace[0]
-		if s.LineNumber != lineNumber {
-			t.Errorf("expected line number %d, got %d", lineNumber, s.LineNumber)
-		} else if s.PackageName != packageName {
-			t.Errorf("expected line number %s, got %s", packageName, s.PackageName)
-		} else if s.FileName != fileName {
-			t.Errorf("expected line number %s, got %s", fileName, s.FileName)
-		} else if s.MethodName != methodName {
-			t.Errorf("expected line number %s, got %s", methodName, s.MethodName)
+		if !reflect.DeepEqual(req.Details.Error.StackTrace, trace) {
+			t.Errorf("expected stack trace %v, got %v", trace, req.Details.Error.StackTrace)
 		}
 
 		w.WriteHeader(202)
@@ -94,7 +86,7 @@ func TestClientCanNotifyRaygunAboutErrorWithCustomStack(t *testing.T) {
 
 	c.endpoint = server.URL
 
-	if err := c.NotifyWithStackOrigin(entry, lineNumber, packageName, fileName, methodName); err != nil {
+	if err := c.NotifyWithStackTrace(entry, trace); err != nil {
 		t.Error(err)
 	}
 }
