@@ -1,6 +1,10 @@
 package stack
 
-import "github.com/kaeuferportal/stack2struct"
+import (
+	"fmt"
+
+	"github.com/kaeuferportal/stack2struct"
+)
 
 // CurrentStack returns the current stack.
 func CurrentStack() Trace {
@@ -24,4 +28,13 @@ type Trace []*TraceElement
 // AddEntry is the method used by stack2struct to dump parsed elements.
 func (s *Trace) AddEntry(lineNumber int, packageName, fileName, methodName string) {
 	*s = append(*s, &TraceElement{lineNumber, packageName, fileName, methodName})
+}
+
+// Format satisfies the Formatter interface from fmt
+func (s *Trace) Format(state fmt.State, verb rune) {
+	if s != nil {
+		for _, el := range *s {
+			fmt.Fprintf(state, "%s:%s in %s line %d", el.PackageName, el.MethodName, el.FileName, el.LineNumber)
+		}
+	}
 }
