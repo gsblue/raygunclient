@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 )
 
@@ -32,20 +31,18 @@ func Post(endpoint string, req *PostRequest, apiKey string, silent bool, debug b
 	}
 	r.Header.Add(apiKeyHeader, apiKey)
 	resp, err := httpClient.Do(r)
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode == 202 {
-		if debug {
-			log.Println("Successfully sent message to Raygun")
-		}
-		return nil
-	}
-
-	errMsg := fmt.Sprintf("Unexpected answer from Raygun %d", resp.StatusCode)
 	if err != nil {
-		errMsg = fmt.Sprintf("%s: %s", errMsg, err.Error())
+		return err
 	}
 
-	return errors.New(errMsg)
+	defer func() {
+		if resp != nil && resp.Body != nil {
+			resp.Body.Close()
+		}
+	}()
+
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("Failed to send message to Raygun with status:%d", resp.StatusCode)
+	}
+	return nil
 }
